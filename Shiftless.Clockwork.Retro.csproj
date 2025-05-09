@@ -1,0 +1,31 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="shaders\frame_buffer.frag" />
+    <None Remove="shaders\main.frag" />
+    <None Remove="shaders\main.vert" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="shaders\frame_buffer.frag" />
+    <EmbeddedResource Include="shaders\main.frag" />
+    <EmbeddedResource Include="shaders\main.vert" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="OpenTK" Version="4.9.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Shiftless.Common\Shiftless.Common.csproj" />
+    <ProjectReference Include="..\Shiftless.OCM\Shiftless.Clockwork.Assets.csproj" />
+  </ItemGroup>
+
+</Project>
