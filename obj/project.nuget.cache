@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "vaehNMgAeXQ=",
+  "dgSpecHash": "e7uu2WAfESI=",
   "success": true,
-  "projectFilePath": "C:\\Users\\Aaron Moulding\\source\\repos\\DemoRogue\\Shiftless.Clockwork.Retro\\Shiftless.Clockwork.Retro.csproj",
+  "projectFilePath": "D:\\My Folders\\Programming\\C#\\Projects\\Shiftless.Clockwork.Retro\\Shiftless.Clockwork.Retro.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Aaron Moulding\\.nuget\\packages\\opentk\\4.9.4\\opentk.4.9.4.nupkg.sha512",
     "C:\\Users\\Aaron Moulding\\.nuget\\packages\\opentk.audio.openal\\4.9.4\\opentk.audio.openal.4.9.4.nupkg.sha512",
