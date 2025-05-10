@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Shiftless.Clockwork.Retro")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+971942af60fcaac6b8c344157276216203f4b753")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+197d9e2dfc04241c7d64e37b72bd021705a138b7")]
 [assembly: System.Reflection.AssemblyProductAttribute("Shiftless.Clockwork.Retro")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Shiftless.Clockwork.Retro")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
