@@ -79,6 +79,8 @@ namespace Shiftless.Clockwork.Retro.Mathematics
         public readonly Point8 Multiply(int x, int y) => new(X * x, Y * y);
 
         public readonly Point8 Divide(int v) => new(X / v, Y / v);
+        public readonly Point8 Divide(in Point8 point) => new(X / point.X, Y / point.Y);
+        public readonly Point8 Divide(int x, int y) => new(X / x, Y / y);
 
         public readonly Point8 Mod(int mX, int mY) => new(MHelp.Mod(X, mX), MHelp.Mod(Y, mY));
         public readonly Point8 Mod(in Point8 m) => Mod(m.X, m.Y);
@@ -113,6 +115,8 @@ namespace Shiftless.Clockwork.Retro.Mathematics
         public static Point8 operator *(Point8 point1, (int x, int y) v) => point1.Multiply(v.x, v.y);
 
         public static Point8 operator /(Point8 point1, int v) => point1.Divide(v);
+        public static Point8 operator /(Point8 point1, Point8 point2) => point1.Divide(point2);
+        public static Point8 operator /(Point8 point1, (int x, int y) v) => point1.Divide(v.x, v.y);
 
         public static bool operator ==(Point8 point1, Point8 point2) => point1.X == point2.X && point1.Y == point2.Y;
         public static bool operator !=(Point8 point1, Point8 point2) => point1.X != point2.X || point1.Y != point2.Y;

@@ -24,8 +24,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Shiftless.Clockwork.Assets\Shiftless.Clockwork.Assets.csproj" />
     <ProjectReference Include="..\Shiftless.Common\Shiftless.Common.csproj" />
-    <ProjectReference Include="..\Shiftless.OCM\Shiftless.Clockwork.Assets.csproj" />
   </ItemGroup>
 
 </Project>
