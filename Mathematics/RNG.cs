@@ -9,8 +9,8 @@ namespace Shiftless.Clockwork.Retro.Mathematics
     public static class RNG
     {
         // Constants
-        public const uint A = 472873u;
-        public const uint C = 1004736278u;
+        public const uint A = 0x41C64E6D;
+        public const uint C = 0x6073;
 
 
         // Current seed
@@ -47,7 +47,7 @@ namespace Shiftless.Clockwork.Retro.Mathematics
         public static byte NextByte(byte max) => (byte)(NextByte() % max);
         public static byte NextByte(byte min, byte max) => (byte)(min + (NextByte() % (max - min)));
 
-        public static float NextFloat() => Next() / 32768f;
+        public static float NextFloat() => Next() / 65535f;
         public static float NextFloat(float max) => NextFloat() * max;
         public static float NextFloat(float min, float max) => min + (max - min) * NextFloat();
     }
