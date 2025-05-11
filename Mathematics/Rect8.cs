@@ -47,12 +47,6 @@ namespace Shiftless.Clockwork.Retro.Mathematics
         public readonly byte Right => (byte)(_x + _width);
         public readonly byte Top => (byte)(_y + _height);
 
-        public readonly byte MinX => Math.Min(Left, Right);
-        public readonly byte MaxX => Math.Max(Left, Right);
-
-        public readonly byte MinY => Math.Min(Bottom, Top);
-        public readonly byte MaxY => Math.Max(Bottom, Top);
-
         public readonly bool IsOutOfBounds
         {
             get
