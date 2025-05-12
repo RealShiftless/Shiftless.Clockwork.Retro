@@ -1,12 +1,7 @@
-﻿using OpenTK.Graphics.OpenGL4;
-using OpenTK.Mathematics;
+﻿using OpenTK.Mathematics;
 using Shiftless.Clockwork.Retro.Input;
+using Shiftless.Clockwork.Retro.Mathematics;
 using Shiftless.Clockwork.Retro.Rendering;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Shiftless.Clockwork.Retro
 {
@@ -14,6 +9,8 @@ namespace Shiftless.Clockwork.Retro
     {
         // Values
         public readonly Window Window;
+
+        public readonly Time Time;
 
         public readonly Renderer Renderer;
         public readonly Tilemap Tilemap;
@@ -31,6 +28,8 @@ namespace Shiftless.Clockwork.Retro
             // Create the stuff
             Window = new Window(settings.WindowTitle, settings.WindowSize, settings.RenderFrequency);
 
+            Time = new();
+
             Renderer = new Renderer(Window);
             Tilemap = new Tilemap();
             Tileset = new Tileset();
@@ -44,8 +43,6 @@ namespace Shiftless.Clockwork.Retro
             Window.OnLoad += Window_Load;
             Window.OnUpdateFrame += Window_Update;
             Window.OnRenderFrame += Window_Render;
-
-            
         }
 
         protected void Run()
@@ -70,6 +67,7 @@ namespace Shiftless.Clockwork.Retro
         }
         private void Window_Update(float deltaTime)
         {
+            Time.Update(deltaTime);
             Update(deltaTime);
 
             _tickTime += deltaTime;
