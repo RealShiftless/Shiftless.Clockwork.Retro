@@ -76,6 +76,8 @@ namespace Shiftless.Clockwork.Retro
                 Tick();
                 _tickTime = 0;
             }
+
+            Tilemap.Update();
         }
 
 

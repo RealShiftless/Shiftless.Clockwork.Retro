@@ -18,6 +18,7 @@ namespace Shiftless.Clockwork.Retro.Rendering
         public const int HEIGHT = 36;
 
         public const int LAYERS = 4;
+        public const int LAYER_SIZE = WIDTH * HEIGHT;
 
         public const int INFO_SIZE = 4;
         public const int LAYER_OFFSET_X_BYTE = 0;
@@ -41,12 +42,9 @@ namespace Shiftless.Clockwork.Retro.Rendering
         private int _textureHandle;
         private int _layerInfoHandle; // We use a texture to store the individual info per layer, like its offset
 
-        private int _minEditX;
-        private int _minEditY;
-        private int _maxEditX;
-        private int _maxEditY;
-        private int _minEditLayer;
-        private int _maxEditLayer;
+        private bool[] _layerChanged = new bool[LAYERS];
+
+        private bool _hasChanged = false;
 
         private readonly ushort[] _data = new ushort[WIDTH * HEIGHT * LAYERS];
 
@@ -76,8 +74,7 @@ namespace Shiftless.Clockwork.Retro.Rendering
             GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureWrapT, (int)TextureWrapMode.ClampToEdge);
 
             // Now refresh to actually fill with data
-            Refresh();
-
+            UploadTexture();
 
             // To store the layers individual info we also create a texture, this stores little bytes like the offset, lets first fill our buffer with the default data
             for (int layerIndex = 0; layerIndex < LAYERS; layerIndex++)
@@ -105,6 +102,38 @@ namespace Shiftless.Clockwork.Retro.Rendering
             GL.TexImage2D(TextureTarget.Texture1DArray, 0, PixelInternalFormat.R8ui, INFO_SIZE, LAYERS, 0, PixelFormat.RedInteger, PixelType.UnsignedByte, _layerInfoBuffer);
         }
 
+        internal void Update()
+        {
+            for(int i = 0; i < LAYERS; i++)
+            {
+                if (!_layerChanged[i])
+                    continue;
+
+                _layerChanged[i] = false;
+
+                UploadLayer(i);
+            }
+        }
+
+        private void UploadTexture()
+        {
+            // Because we always keep the tilemap bound we can just activate its unit :)
+            GL.ActiveTexture(TEXTURE_UNIT);
+
+            // And here we can just set all the data at once
+            GL.TexImage3D(TextureTarget.Texture2DArray, 0, PixelInternalFormat.R16ui, WIDTH, HEIGHT, LAYERS, 0, PixelFormat.RedInteger, PixelType.UnsignedShort, _data);
+        }
+        private void UploadLayer(int layer)
+        {
+            // Because we always keep the tilemap bound we can just activate its unit :)
+            GL.ActiveTexture(TEXTURE_UNIT);
+
+            int offsetIndex = layer * LAYER_SIZE;
+            GL.TexSubImage3D(TextureTarget.Texture2DArray, 0, 0, 0, layer, WIDTH, HEIGHT, 1, PixelFormat.RedInteger, PixelType.UnsignedShort, _data[offsetIndex..(offsetIndex+LAYER_SIZE)]);
+        }
+
+
+        [Obsolete("Refresh is now handled by the engine.")]
         public void Refresh()
         {
             // Because we always keep the tilemap bound we can just activate its unit :)
@@ -155,6 +184,8 @@ namespace Shiftless.Clockwork.Retro.Rendering
 
             ushort packedTile = (ushort)(tileIndex << 8 | (int)transform << 4 | (int)paletteId);
             _data[index] = packedTile;
+
+            _layerChanged[index / LAYER_SIZE] = true;
         }
         public void Set(int x, int y, int layer, byte? tileIndex = null, TileTransform? transform = null, PaletteIndex? paletteId = null) => Set(CalculateIndex(x, y, layer), tileIndex, transform, paletteId);
         public void Set(Point8 pos, int layer, byte? tileIndex = null, TileTransform? transform = null, PaletteIndex? paletteId = null) => Set(pos.X, pos.Y, layer, tileIndex, transform, paletteId);
