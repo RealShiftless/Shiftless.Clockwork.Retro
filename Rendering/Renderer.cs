@@ -24,7 +24,8 @@ namespace Shiftless.Clockwork.Retro.Rendering
         public const TextureUnit PALETTE_UNIT = TextureUnit.Texture3;
 
         public const TextureUnit OBJECT_BUFFER_UNIT = TextureUnit.Texture4;
-        public const TextureUnit OBJECT_BUCKET_UNIT = TextureUnit.Texture5;
+        public const TextureUnit OBJECT_INDEX_UNIT  = TextureUnit.Texture5;
+        public const TextureUnit OBJECT_BUCKET_UNIT = TextureUnit.Texture6;
 
         public const TextureUnit FBO_UNIT = TextureUnit.Texture15;
 

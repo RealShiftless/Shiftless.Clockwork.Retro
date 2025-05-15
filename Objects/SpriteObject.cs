@@ -25,11 +25,17 @@ namespace Shiftless.Clockwork.Retro.Objects
         // Properties
         public bool IsActive => _isActive;
 
-        float ISpatialObject2D.MinX => _position.X;
-        float ISpatialObject2D.MinY => _position.Y;
+        public short MinX => _position.X;
+        public short MinY => _position.Y;
+        public short MaxX => (short)(_position.X + _mode.GetSize().Width);
+        public short MaxY => (short)(_position.Y + _mode.GetSize().Height);
 
-        float ISpatialObject2D.MaxX => _position.X + _mode.GetSize().Width;
-        float ISpatialObject2D.MaxY => _position.Y + _mode.GetSize().Width;
+
+        // Interface Prop
+        float ISpatialObject2D.MinX => MinX;
+        float ISpatialObject2D.MinY => MinY;
+        float ISpatialObject2D.MaxX => MaxX;
+        float ISpatialObject2D.MaxY => MaxY;
 
 
         // Constructor
@@ -45,8 +51,6 @@ namespace Shiftless.Clockwork.Retro.Objects
         {
             if (textures.Length != mode.GetSpriteCount())
                 throw new ArgumentException($"Invallid textures length for sprite mode {mode}, expected {mode.GetSpriteCount()} got {textures.Length}!");
-
-            _isActive = true;
 
             _position = position;
             _mode = mode;

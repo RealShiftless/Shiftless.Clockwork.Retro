@@ -1,5 +1,6 @@
 ﻿using Shiftless.Clockwork.Retro.Mathematics;
 using Shiftless.Common.Mathematics;
+using System;
 
 namespace Shiftless.Clockwork.Retro.Objects
 {
@@ -19,14 +20,22 @@ namespace Shiftless.Clockwork.Retro.Objects
 
         private bool _requiresUpdate;
 
+        private Vec2i16 _offset;
+
+        private byte[] _bucketIndices = new byte[SpriteObject.MAX];
+        private ushort[,] _screenBuckets = new ushort[15, 9];
+
 
         // Properties
         public bool RequiresUpdate => _requiresUpdate;
+
+        internal ushort[,] ScreenBuckets => _screenBuckets;
 
 
         // Constructor
         internal SpriteObjectManager(GameBase game)
         {
+            // Values
             Game = game;
 
             // Initialize all sprite objects
@@ -39,14 +48,28 @@ namespace Shiftless.Clockwork.Retro.Objects
 
 
         // Func
-        public SpriteObject Activate(Vec2i16 position, SpriteMode mode, PaletteIndex palette, byte[] textures)
+        public SpriteObject ActivateDirect(byte id, Vec2i16 position, SpriteMode mode, PaletteIndex palette, byte[] textures)
         {
-            byte index = _freeObjects.Dequeue();
-            _activeObjects.Add(index);
+            _activeObjects.Add(id);
 
-            _spriteObjects[index].Activate(position, mode, palette, textures);
+            _spriteObjects[id].SetActive(true);
+            _spriteObjects[id].Activate(position, mode, palette, textures);
 
-            return _spriteObjects[index];
+            return _spriteObjects[id];
+        }
+        public SpriteObject Activate(byte id, Vec2i16 position, SpriteMode mode, PaletteIndex palette, byte[] textures)
+        {
+            if (_spriteObjects[id].IsActive)
+                throw new InvalidOperationException($"{nameof(SpriteObject)} was already active!");
+
+            return ActivateDirect(id, position, mode, palette, textures);
+        }
+        public SpriteObject ActivateNext(Vec2i16 position, SpriteMode mode, PaletteIndex palette, byte[] textures)
+        {
+            if (_freeObjects.Count == 0)
+                throw new OutOfMemoryException("All sprite objects where active!");
+
+            return ActivateDirect(_freeObjects.Dequeue(), position, mode, palette, textures);
         }
 
         public void Deactivate(SpriteObject obj)
@@ -56,6 +79,8 @@ namespace Shiftless.Clockwork.Retro.Objects
 
             _activeObjects.Remove(obj.Id);
             _freeObjects.Enqueue(obj.Id);
+
+            obj.SetActive(false);
         }
     }
 }
