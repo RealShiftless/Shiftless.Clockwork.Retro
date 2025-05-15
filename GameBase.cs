@@ -71,7 +71,7 @@ namespace Shiftless.Clockwork.Retro
             Update(deltaTime);
 
             _tickTime += deltaTime;
-            if(_tickTime > _tickDelay)
+            if (_tickTime > _tickDelay)
             {
                 Tick();
                 _tickTime = 0;

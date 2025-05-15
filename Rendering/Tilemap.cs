@@ -1,13 +1,6 @@
 ﻿using OpenTK.Graphics.OpenGL4;
-using OpenTK.Mathematics;
 using Shiftless.Clockwork.Retro.Mathematics;
 using Shiftless.Common.Mathematics;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection.Metadata.Ecma335;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Shiftless.Clockwork.Retro.Rendering
 {
@@ -29,13 +22,6 @@ namespace Shiftless.Clockwork.Retro.Rendering
 
         public const int PIXEL_WIDTH = WIDTH * Tileset.TILE_PIXEL_AREA;
         public const int PIXEL_HEIGHT = HEIGHT * Tileset.TILE_PIXEL_AREA;
-
-        public const TextureUnit TEXTURE_UNIT = TextureUnit.Texture1;
-        public const TextureUnit INFO_UNIT = TextureUnit.Texture3;
-
-        private const ushort INDEX_CLEAR_MASK = 0b0000000011111111;
-        private const ushort TRANSFORM_CLEAR_MASK = 0b1111111100001111;
-        private const ushort PALETTE_CLEAR_MASK = 0b1111111111110000;
 
 
         // Values
@@ -64,7 +50,7 @@ namespace Shiftless.Clockwork.Retro.Rendering
             _textureHandle = GL.GenTexture();
 
             // First we bind it to its unit
-            GL.ActiveTexture(TEXTURE_UNIT);
+            GL.ActiveTexture(Renderer.TILEMAP_UNIT);
             GL.BindTexture(TextureTarget.Texture2DArray, _textureHandle);
 
             // We setup some parameters for the texture
@@ -89,7 +75,7 @@ namespace Shiftless.Clockwork.Retro.Rendering
             _layerInfoHandle = GL.GenTexture();
 
             // We activate the unit and fill up some default data
-            GL.ActiveTexture(INFO_UNIT);
+            GL.ActiveTexture(Renderer.TILEMAP_INFO_UNIT);
             GL.BindTexture(TextureTarget.Texture1DArray, _layerInfoHandle);
 
             // We setup some parameters for the texture
@@ -104,7 +90,7 @@ namespace Shiftless.Clockwork.Retro.Rendering
 
         internal void Update()
         {
-            for(int i = 0; i < LAYERS; i++)
+            for (int i = 0; i < LAYERS; i++)
             {
                 if (!_layerChanged[i])
                     continue;
@@ -118,7 +104,7 @@ namespace Shiftless.Clockwork.Retro.Rendering
         private void UploadTexture()
         {
             // Because we always keep the tilemap bound we can just activate its unit :)
-            GL.ActiveTexture(TEXTURE_UNIT);
+            GL.ActiveTexture(Renderer.TILEMAP_UNIT);
 
             // And here we can just set all the data at once
             GL.TexImage3D(TextureTarget.Texture2DArray, 0, PixelInternalFormat.R16ui, WIDTH, HEIGHT, LAYERS, 0, PixelFormat.RedInteger, PixelType.UnsignedShort, _data);
@@ -126,10 +112,10 @@ namespace Shiftless.Clockwork.Retro.Rendering
         private void UploadLayer(int layer)
         {
             // Because we always keep the tilemap bound we can just activate its unit :)
-            GL.ActiveTexture(TEXTURE_UNIT);
+            GL.ActiveTexture(Renderer.TILEMAP_UNIT);
 
             int offsetIndex = layer * LAYER_SIZE;
-            GL.TexSubImage3D(TextureTarget.Texture2DArray, 0, 0, 0, layer, WIDTH, HEIGHT, 1, PixelFormat.RedInteger, PixelType.UnsignedShort, _data[offsetIndex..(offsetIndex+LAYER_SIZE)]);
+            GL.TexSubImage3D(TextureTarget.Texture2DArray, 0, 0, 0, layer, WIDTH, HEIGHT, 1, PixelFormat.RedInteger, PixelType.UnsignedShort, _data[offsetIndex..(offsetIndex + LAYER_SIZE)]);
         }
 
 
@@ -137,24 +123,25 @@ namespace Shiftless.Clockwork.Retro.Rendering
         public void Refresh()
         {
             // Because we always keep the tilemap bound we can just activate its unit :)
-            GL.ActiveTexture(TEXTURE_UNIT);
+            GL.ActiveTexture(Renderer.TILEMAP_UNIT);
 
             // And here we can just set all the data at once
             GL.TexImage3D(TextureTarget.Texture2DArray, 0, PixelInternalFormat.R16ui, WIDTH, HEIGHT, LAYERS, 0, PixelFormat.RedInteger, PixelType.UnsignedShort, _data);
         }
 
-        public Vec2i GetOffset(byte layer)
+        public Vec2i GetOffset(LayerIndex layer)
         {
-            int index = layer * INFO_SIZE;
+            int index = (byte)layer * INFO_SIZE;
 
             ushort x = (ushort)(_layerInfoBuffer[index + LAYER_OFFSET_X_BYTE + 1] << 8 | _layerInfoBuffer[index + LAYER_OFFSET_X_BYTE + 0]);
             ushort y = (ushort)(_layerInfoBuffer[index + LAYER_OFFSET_Y_BYTE + 1] << 8 | _layerInfoBuffer[index + LAYER_OFFSET_Y_BYTE + 0]);
 
             return new Vec2i(x, y);
         }
-        public void SetOffset(byte layer, int x, int y)
+
+        public void SetOffset(LayerIndex layer, int x, int y)
         {
-            int index = layer * INFO_SIZE;
+            int index = (byte)layer * INFO_SIZE;
 
             x = MHelp.Mod(x, PIXEL_WIDTH);
             y = MHelp.Mod(y, PIXEL_HEIGHT);
@@ -171,10 +158,11 @@ namespace Shiftless.Clockwork.Retro.Rendering
 
             byte[] data = [x1, x2, y1, y2];
 
-            GL.ActiveTexture(INFO_UNIT);
-            GL.TexSubImage2D(TextureTarget.Texture1DArray, 0, 0, layer, 4, 1, PixelFormat.RedInteger, PixelType.UnsignedByte, data);
+            GL.ActiveTexture(Renderer.TILEMAP_INFO_UNIT);
+            GL.TexSubImage2D(TextureTarget.Texture1DArray, 0, 0, (byte)layer, 4, 1, PixelFormat.RedInteger, PixelType.UnsignedByte, data);
         }
-        public void SetOffset(byte layer, Vec2i offset) => SetOffset(layer, offset.X, offset.Y);
+        public void SetOffset(LayerIndex layer, Vec2i offset) => SetOffset(layer, offset.X, offset.Y);
+
 
         public void Set(int index, byte? tileIndex = null, TileTransform? transform = null, PaletteIndex? paletteId = null)
         {
@@ -187,20 +175,20 @@ namespace Shiftless.Clockwork.Retro.Rendering
 
             _layerChanged[index / LAYER_SIZE] = true;
         }
-        public void Set(int x, int y, int layer, byte? tileIndex = null, TileTransform? transform = null, PaletteIndex? paletteId = null) => Set(CalculateIndex(x, y, layer), tileIndex, transform, paletteId);
-        public void Set(Point8 pos, int layer, byte? tileIndex = null, TileTransform? transform = null, PaletteIndex? paletteId = null) => Set(pos.X, pos.Y, layer, tileIndex, transform, paletteId);
+        public void Set(int x, int y, LayerIndex layer, byte? tileIndex = null, TileTransform? transform = null, PaletteIndex? paletteId = null) => Set(CalculateIndex(x, y, layer), tileIndex, transform, paletteId);
+        public void Set(Point8 pos, LayerIndex layer, byte? tileIndex = null, TileTransform? transform = null, PaletteIndex? paletteId = null) => Set(pos.X, pos.Y, layer, tileIndex, transform, paletteId);
 
         public void SetTile(int index, byte tileIndex) => Set(index, tileIndex: tileIndex);
-        public void SetTile(int x, int y, int layer, byte tileIndex) => SetTile(CalculateIndex(x, y, layer), tileIndex);
-        public void SetTile(Point8 pos, int layer, byte tileIndex) => SetTile(pos.X, pos.Y, layer, tileIndex);
+        public void SetTile(int x, int y, LayerIndex layer, byte tileIndex) => SetTile(CalculateIndex(x, y, layer), tileIndex);
+        public void SetTile(Point8 pos, LayerIndex layer, byte tileIndex) => SetTile(pos.X, pos.Y, layer, tileIndex);
 
         public void SetTransform(int index, TileTransform transform) => Set(index, transform: transform);
-        public void SetTransform(int x, int y, int layer, TileTransform transform) => SetTransform(CalculateIndex(x, y, layer), transform);
-        public void SetTransform(Point8 pos, int layer, TileTransform transform) => SetTransform(pos.X, pos.Y, layer, transform);
+        public void SetTransform(int x, int y, LayerIndex layer, TileTransform transform) => SetTransform(CalculateIndex(x, y, layer), transform);
+        public void SetTransform(Point8 pos, LayerIndex layer, TileTransform transform) => SetTransform(pos.X, pos.Y, layer, transform);
 
         public void SetPalette(int index, PaletteIndex paletteId) => Set(index, paletteId: paletteId);
-        public void SetPalette(int x, int y, int layer, PaletteIndex paletteId) => SetPalette(CalculateIndex(x, y, layer), paletteId);
-        public void SetPalette(Point8 pos, int layer, PaletteIndex paletteId) => SetPalette(pos.X, pos.Y, layer, paletteId);
+        public void SetPalette(int x, int y, LayerIndex layer, PaletteIndex paletteId) => SetPalette(CalculateIndex(x, y, layer), paletteId);
+        public void SetPalette(Point8 pos, LayerIndex layer, PaletteIndex paletteId) => SetPalette(pos.X, pos.Y, layer, paletteId);
 
         public (byte tileId, TileTransform transform, PaletteIndex paletteId) Get(int index)
         {
@@ -212,25 +200,25 @@ namespace Shiftless.Clockwork.Retro.Rendering
 
             return (tileId, transform, paletteId);
         }
-        public (byte tileId, TileTransform transform, PaletteIndex paletteId) Get(int x, int y, int layer) => Get(CalculateIndex(x, y, layer));
+        public (byte tileId, TileTransform transform, PaletteIndex paletteId) Get(int x, int y, LayerIndex layer) => Get(CalculateIndex(x, y, layer));
 
         public byte GetTile(int index) => (byte)(_data[index] >> 8);
-        public byte GetTile(int x, int y, int layer) => GetTile(CalculateIndex(x, y, layer));
+        public byte GetTile(int x, int y, LayerIndex layer) => GetTile(CalculateIndex(x, y, layer));
 
         public TileTransform GetTransform(int index) => (TileTransform)(_data[index] >> 4 & 0xF);
-        public TileTransform GetTransform(int x, int y, int layer) => GetTransform(CalculateIndex(x, y, layer));
+        public TileTransform GetTransform(int x, int y, LayerIndex layer) => GetTransform(CalculateIndex(x, y, layer));
 
         public PaletteIndex GetPalette(int index) => (PaletteIndex)(_data[index] & 0xF);
-        public PaletteIndex GetPalette(int x, int y, int layer) => GetPalette(CalculateIndex(x, y, layer));
+        public PaletteIndex GetPalette(int x, int y, LayerIndex layer) => GetPalette(CalculateIndex(x, y, layer));
 
-        private static int CalculateIndex(int x, int y, int layer)
+        private static int CalculateIndex(int x, int y, LayerIndex layer)
         {
             if (x < 0 || x >= WIDTH)
                 x = MHelp.Mod(x, WIDTH);
             if (y < 0 || y >= HEIGHT)
                 y = MHelp.Mod(y, HEIGHT);
 
-            return y * WIDTH + x + layer * WIDTH * HEIGHT;
+            return y * WIDTH + x + (int)layer * WIDTH * HEIGHT;
         }
     }
 }

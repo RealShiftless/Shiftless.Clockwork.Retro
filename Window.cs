@@ -29,7 +29,7 @@ namespace Shiftless.Clockwork.Retro
         public Vector2i ClientSize
         {
             get => _glWindow.ClientSize;
-            set => _glWindow.ClientSize = value; 
+            set => _glWindow.ClientSize = value;
         }
 
         // TODO: Make input manager and make this private :)
@@ -40,7 +40,7 @@ namespace Shiftless.Clockwork.Retro
         // Constructor
         internal Window(string title, Vector2i size, int updateFrequency)
         {
-            _glWindow = new(new() { UpdateFrequency = updateFrequency}, new()
+            _glWindow = new(new() { UpdateFrequency = updateFrequency }, new()
             {
                 Title = title,
                 ClientSize = size
@@ -56,7 +56,7 @@ namespace Shiftless.Clockwork.Retro
             _glWindow.KeyUp += KeyboardKeyReleased;
         }
 
-        
+
 
 
 

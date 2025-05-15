@@ -2,14 +2,9 @@
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 using Shiftless.Clockwork.Retro.Rendering;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Shiftless.Clockwork.Retro.Input
 {
@@ -97,7 +92,7 @@ namespace Shiftless.Clockwork.Retro.Input
         // Key stuff
         private void KeyPressed(KeyboardKeyEventArgs e)
         {
-            
+
         }
         private void KeyReleased(KeyboardKeyEventArgs e)
         {

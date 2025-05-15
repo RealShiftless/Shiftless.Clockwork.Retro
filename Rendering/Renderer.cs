@@ -1,15 +1,7 @@
 ﻿using OpenTK.Graphics.OpenGL4;
-using OpenTK.Windowing.GraphicsLibraryFramework;
 using Shiftless.Clockwork.Retro.Mathematics;
-using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
 using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 #nullable disable
 namespace Shiftless.Clockwork.Retro.Rendering
@@ -22,7 +14,19 @@ namespace Shiftless.Clockwork.Retro.Rendering
 
         public const float NATIVE_ASPECT_RATIO = (float)NATIVE_WIDTH / NATIVE_HEIGHT;
 
-        public const TextureUnit FBO_UNIT = TextureUnit.Texture4;
+
+        //  Texture Units
+        public const TextureUnit TILESET_UNIT = TextureUnit.Texture0;
+
+        public const TextureUnit TILEMAP_UNIT = TextureUnit.Texture1;
+        public const TextureUnit TILEMAP_INFO_UNIT = TextureUnit.Texture2;
+
+        public const TextureUnit PALETTE_UNIT = TextureUnit.Texture3;
+
+        public const TextureUnit OBJECT_BUFFER_UNIT = TextureUnit.Texture4;
+        public const TextureUnit OBJECT_BUCKET_UNIT = TextureUnit.Texture5;
+
+        public const TextureUnit FBO_UNIT = TextureUnit.Texture15;
 
 
         // Values
@@ -55,7 +59,7 @@ namespace Shiftless.Clockwork.Retro.Rendering
             _screenViewport = new(0, 0, window.ClientSize.X, window.ClientSize.Y);
         }
 
-        
+
         // Func
         internal void Initialize()
         {
@@ -127,11 +131,11 @@ namespace Shiftless.Clockwork.Retro.Rendering
         }
         public Palette GetPalette(PaletteIndex index) => _palettes[(int)index];
 
-        
+
         private void InitializeFramebuffer()
         {
             // First create the stuff
-            _frameBufferHandle  = GL.GenFramebuffer();
+            _frameBufferHandle = GL.GenFramebuffer();
             _frameTextureHandle = GL.GenTexture();
 
             GL.BindFramebuffer(FramebufferTarget.Framebuffer, _frameBufferHandle);
@@ -160,7 +164,7 @@ namespace Shiftless.Clockwork.Retro.Rendering
             _paletteHandle = GL.GenTexture();
 
             // Bind it, we bind is as a texture1D array as its a 1d array or colors
-            GL.ActiveTexture(Palette.TEXTURE_UNIT);
+            GL.ActiveTexture(PALETTE_UNIT);
             GL.BindTexture(TextureTarget.Texture1DArray, _paletteHandle);
 
             // We setup some parameters for the texture
@@ -177,10 +181,10 @@ namespace Shiftless.Clockwork.Retro.Rendering
             // Setup the main shader
             _mainShader = Shader.LoadEmbeddedShader(Assembly.GetExecutingAssembly(), "shaders.main.vert", "shaders.main.frag");
 
-            _mainShader.Set("tileset", Tileset.TEXTURE_UNIT - TextureUnit.Texture0);
-            _mainShader.Set("tilemap", Tilemap.TEXTURE_UNIT - TextureUnit.Texture0);
-            _mainShader.Set("palette", Palette.TEXTURE_UNIT - TextureUnit.Texture0);
-            _mainShader.Set("info", Tilemap.INFO_UNIT - TextureUnit.Texture0);
+            _mainShader.Set("tileset", TILESET_UNIT - TextureUnit.Texture0);
+            _mainShader.Set("tilemap", TILEMAP_UNIT - TextureUnit.Texture0);
+            _mainShader.Set("info", TILEMAP_INFO_UNIT - TextureUnit.Texture0);
+            _mainShader.Set("palette", PALETTE_UNIT - TextureUnit.Texture0);
 
             // Setup the framebuffer shader
             _frameBufferShader = Shader.LoadEmbeddedShader(Assembly.GetExecutingAssembly(), "shaders.main.vert", "shaders.frame_buffer.frag");
@@ -194,7 +198,7 @@ namespace Shiftless.Clockwork.Retro.Rendering
         private void RefreshPalettes()
         {
             // Because we always keep our palette bound to PALETTE_UNIT we dont have to bind the texture, only set it as the active one
-            GL.ActiveTexture(Palette.TEXTURE_UNIT);
+            GL.ActiveTexture(PALETTE_UNIT);
 
             // We create a buffer for the color data
             ushort[] paletteData = new ushort[Palette.MAX * Palette.COLORS];

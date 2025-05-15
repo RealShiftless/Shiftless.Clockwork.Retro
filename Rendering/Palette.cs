@@ -1,13 +1,5 @@
-﻿using OpenTK.Graphics.OpenGL4;
-using Shiftless.Clockwork.Retro.Mathematics;
+﻿using Shiftless.Clockwork.Retro.Mathematics;
 using Shiftless.Common.Mathematics;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Shiftless.Clockwork.Retro.Rendering
 {
@@ -17,7 +9,6 @@ namespace Shiftless.Clockwork.Retro.Rendering
         public const int COLORS = 4;
 
         public const int MAX = 16;
-        public const TextureUnit TEXTURE_UNIT = TextureUnit.Texture2;
 
 
         // Values

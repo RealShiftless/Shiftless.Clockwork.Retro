@@ -1,10 +1,5 @@
 ﻿using OpenTK.Graphics.OpenGL4;
 using Shiftless.Clockwork.Assets;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Shiftless.Clockwork.Retro.Rendering
 {
@@ -16,8 +11,6 @@ namespace Shiftless.Clockwork.Retro.Rendering
         public const int TILE_PIXEL_AREA = 8;
         public const int TILE_BYTE_SIZE = TILE_PIXEL_AREA / PIXELS_PER_BYTE * TILE_PIXEL_AREA;
         public const int PIXELS_PER_BYTE = 4;
-
-        public const TextureUnit TEXTURE_UNIT = TextureUnit.Texture0;
 
 
         // Values
@@ -40,7 +33,7 @@ namespace Shiftless.Clockwork.Retro.Rendering
         {
             _handle = GL.GenTexture();
 
-            GL.ActiveTexture(TEXTURE_UNIT);
+            GL.ActiveTexture(Renderer.TILESET_UNIT);
             GL.BindTexture(TextureTarget.Texture2DArray, _handle);
 
             GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Nearest);
@@ -87,7 +80,7 @@ namespace Shiftless.Clockwork.Retro.Rendering
                 throw new ArgumentException($"Texture at index {index} was not free!");
 
             // Set the data
-            GL.ActiveTexture(TEXTURE_UNIT);
+            GL.ActiveTexture(Renderer.TILESET_UNIT);
             GL.TexSubImage3D(TextureTarget.Texture2DArray, 0, 0, 0, index, TILE_PIXEL_AREA / PIXELS_PER_BYTE, TILE_PIXEL_AREA, 1, PixelFormat.RedInteger, PixelType.UnsignedByte, data);
 
             // And mark this texture as unocupied
@@ -173,26 +166,6 @@ namespace Shiftless.Clockwork.Retro.Rendering
             // And now just load the data direct thru a function that only exists so that we can also pre declare indices
             LoadTextures(data, indices, false);
 
-            /*
-            // Get the raw pixel data
-            byte[] rawData = data.Raw.ToArray();
-
-            // Lets loop over all the tiles to load them
-            for (int i = 0; i < textures; i++)
-            {
-                // Get the next free index
-                if (!GetNextIndex(out byte index))
-                    throw new OutOfMemoryException("No texture was free!");
-
-                SetTextureOcupiedFlag(index, true);
-
-                byte[] bytes = rawData[(i * TILE_BYTE_SIZE)..(i * TILE_BYTE_SIZE + TILE_BYTE_SIZE)];
-                GL.TexSubImage3D(TextureTarget.Texture2DArray, 0, 0, 0, index, TILE_PIXEL_AREA / PIXELS_PER_BYTE, TILE_PIXEL_AREA, 1, PixelFormat.RedInteger, PixelType.UnsignedByte, bytes);
-
-                textureHandles[i] = index;
-            }
-            */
-
             // Return the texture handles
             return indices;
         }
@@ -204,20 +177,6 @@ namespace Shiftless.Clockwork.Retro.Rendering
             // First check if its free if we're asked to
             if (checkFree && IsTextureOccupied(index))
                 throw new Exception($"Texture at index {index} was not free!");
-
-            /*
-            // Activate its unit
-            GL.ActiveTexture(TEXTURE_UNIT);
-
-            // Replace the path with apriopriate path per system
-            path = path.Replace('\\', Path.DirectorySeparatorChar);
-
-            // Make the path local to the Clockwork Asset Pipeline ting
-            path = Path.Combine("assets", "bin", $"{path}.bin");
-
-            // Load the data
-            Texture2DData data = Texture2DData.LoadFromFile(path);
-            */
 
             Texture2DData data = LoadTextureData(path);
             LoadTexture(data.Raw.ToArray(), index, false);
